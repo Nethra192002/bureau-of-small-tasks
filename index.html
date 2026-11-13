@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-visual">
+  <meta name="theme-color" content="#3b2416">
+  <title>Bureau of Small Tasks</title>
+  <meta name="description" content="A cozy to-do desk where tasks arrive as paperwork and you stamp them.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Special+Elite&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Rough-edge filter for ink impressions -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="ink-rough" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/>
+    </filter>
+  </svg>
+
+  <main id="desk">
+    <!-- Desk dressing -->
+    <div class="blotter" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="tea-ring" aria-hidden="true"></div>
+    <div class="pencil" aria-hidden="true"></div>
+    <div class="lamp-glow" aria-hidden="true"></div>
+
+    <!-- Desk items unlocked by rank -->
+    <div id="item-plant" class="item" hidden aria-hidden="true"><span class="pot"></span><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div id="item-mug" class="item" hidden aria-hidden="true"><span class="steam"><i></i><i></i><i></i></span></div>
+    <div id="item-cat" class="item" hidden aria-hidden="true">
+      <span class="cat-tail"></span><span class="cat-body"></span>
+      <span class="cat-head"><i></i><i></i></span><span class="cat-z">z</span>
+    </div>
+    <button id="item-radio" class="item" hidden type="button" aria-pressed="false" title="Radio: click for soft ambience">
+      <span class="radio-grille"></span><span class="radio-dial"></span>
+    </button>
+    <button id="item-ink" class="item" hidden type="button" aria-pressed="false" title="Bureau-blue ink: click to change your DONE ink"></button>
+    <div id="item-lamp" class="item" hidden aria-hidden="true"><span class="lamp-arm"></span><span class="lamp-shade"></span></div>
+    <div id="item-cert" class="item" hidden aria-hidden="true"><b>Director</b><span></span></div>
+
+    <!-- Flip calendar (top left) -->
+    <div id="calendar" class="obj" role="button" tabindex="0" aria-label="Today's date. Open the planner" title="Open the planner">
+      <div class="cal-rings" aria-hidden="true"><i></i><i></i></div>
+      <div class="cal-month" id="cal-month"></div>
+      <div class="cal-day" id="cal-day"></div>
+      <div class="cal-weekday" id="cal-weekday"></div>
+      <div class="cal-tally" id="cal-tally"></div>
+    </div>
+
+    <!-- Today's appointments, clipped to the top edge -->
+    <div id="agenda" aria-label="Today's appointments"></div>
+
+    <!-- Nameplate (top centre) -->
+    <div id="nameplate" class="obj">
+      <div class="np-name" id="np-name">&nbsp;</div>
+      <div class="np-rank" id="np-rank">Junior Clerk</div>
+      <div class="np-xp" aria-hidden="true"><i id="np-xp-bar"></i></div>
+      <div class="np-clerk" id="np-clerk" role="status" hidden></div>
+      <div class="np-pending" id="np-pending" hidden></div>
+    </div>
+    <div id="promo" hidden></div>
+
+    <!-- Stamp rack (top right) -->
+    <div id="stamp-rack" class="obj" aria-label="Stamp rack">
+      <button class="stamp" data-type="done" type="button" aria-label="Done stamp (D)">
+        <span class="stamp-head"><span class="stamp-knob"></span></span>
+        <span class="stamp-label">Done <kbd>D</kbd></span>
+      </button>
+      <button class="stamp" data-type="delayed" type="button" aria-label="Delayed stamp (L)">
+        <span class="stamp-head"><span class="stamp-knob"></span></span>
+        <span class="stamp-label">Delayed <kbd>L</kbd></span>
+      </button>
+      <button class="stamp" data-type="denied" type="button" aria-label="Denied stamp (X)">
+        <span class="stamp-head"><span class="stamp-knob"></span></span>
+        <span class="stamp-label">Denied <kbd>X</kbd></span>
+      </button>
+    </div>
+
+    <!-- Trays -->
+    <div id="in-tray" class="tray obj" aria-label="In-tray" title="Click to take the next paper">
+      <div class="tray-well"><div class="tray-stack" id="in-stack"></div></div>
+      <div class="tray-plate">In<span id="in-count"></span></div>
+    </div>
+    <div id="out-tray" class="tray obj" aria-label="Out-tray" title="Click to open the records">
+      <div class="tray-well"><div class="tray-stack" id="out-stack"></div></div>
+      <div class="tray-plate">Out<span id="out-count"></span></div>
+    </div>
+
+    <!-- Bin + shredder (bottom corners) -->
+    <div id="bin" class="obj" aria-label="Bin">
+      <span class="obj-label">Bin</span>
+    </div>
+    <button id="later" class="obj" type="button" aria-label="Later pile" title="Papers set aside for later">
+      <span class="later-stack" id="later-stack"></span>
+      <span class="later-clip"></span>
+      <span class="obj-label">Later<span id="later-count"></span></span>
+    </button>
+    <div id="shredder" class="obj" aria-label="Shredder">
+      <div class="shred-slot"></div>
+      <div class="shred-light"></div>
+      <div class="shred-strips" id="shred-strips"></div>
+      <span class="obj-label">Shredder</span>
+    </div>
+
+    <!-- Intake slot (bottom centre) -->
+    <form id="intake" class="obj" autocomplete="off">
+      <label for="intake-input">Intake</label>
+      <input id="intake-input" type="text" maxlength="140" placeholder="Type a task and press Enter…" spellcheck="false">
+    </form>
+
+    <!-- Settings gear -->
+    <button id="gear" class="obj" type="button" aria-label="Settings" aria-expanded="false">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <g fill="currentColor">
+          <rect x="10.4" y="1.500" width="3.200" height="21" rx="1"/>
+          <rect x="10.4" y="1.500" width="3.200" height="21" rx="1" transform="rotate(45 12 12)"/>
+          <rect x="10.4" y="1.500" width="3.200" height="21" rx="1" transform="rotate(90 12 12)"/>
+          <rect x="10.4" y="1.500" width="3.200" height="21" rx="1" transform="rotate(135 12 12)"/>
+        </g>
+        <circle cx="12" cy="12" r="7.200" fill="currentColor"/>
+        <circle cx="12" cy="12" r="3" fill="#d9c08a"/>
+      </svg>
+    </button>
+    <!-- Desk bell: close the office -->
+    <button id="bell" class="obj" type="button" aria-label="Close the office" title="Close the office">
+      <span class="obj-label">Close</span>
+    </button>
+    <div id="settings" class="memo" hidden>
+      <div class="memo-title">Office Settings</div>
+      <button type="button" data-act="export">Export backup</button>
+      <button type="button" data-act="import">Import backup</button>
+      <button type="button" data-act="send">Send papers to another desk</button>
+      <button type="button" data-act="mute" id="mute-btn">Sound: on</button>
+      <button type="button" data-act="reset" id="reset-btn" class="danger">Reset desk</button>
+      <input type="file" id="import-file" accept="application/json,.json" hidden>
+    </div>
+
+    <!-- Undo slip -->
+    <div id="undo-note" hidden>
+      <span id="undo-text"></span>
+      <button type="button" id="undo-btn">Undo</button>
+      <i class="undo-bar"></i>
+    </div>
+
+    <div class="vignette" aria-hidden="true"></div>
+  </main>
+
+  <!-- Ledger: records (from the Out-tray) or the Later pile -->
+  <div id="ledger" hidden>
+    <div class="ledger-sheet" role="dialog" aria-labelledby="ledger-title">
+      <div class="ledger-title" id="ledger-title"></div>
+      <div class="ledger-sub" id="ledger-sub"></div>
+      <ul id="ledger-list"></ul>
+      <button type="button" id="ledger-close">Close the ledger</button>
+    </div>
+  </div>
+
+  <!-- Month planner (from the flip calendar) -->
+  <div id="planner" hidden>
+    <div class="planner-sheet" role="dialog" aria-labelledby="pl-title">
+      <div class="planner-holes" aria-hidden="true"></div>
+      <div class="planner-head">
+        <button type="button" id="pl-prev" aria-label="Previous month">&lsaquo;</button>
+        <div id="pl-title"></div>
+        <button type="button" id="pl-next" aria-label="Next month">&rsaquo;</button>
+      </div>
+      <div class="planner-grid" id="pl-grid"></div>
+      <div class="planner-day" id="pl-day"></div>
+      <button type="button" id="pl-close">Close the planner</button>
+    </div>
+  </div>
+
+  <!-- Shift report (from the desk bell) -->
+  <div id="report" hidden>
+    <div class="receipt-wrap"><div class="receipt" id="receipt" role="dialog" aria-label="Shift report"></div></div>
+  </div>
+
+  <!-- Requisition form: choose a desk item at each rank -->
+  <div id="choice" hidden>
+    <div class="letter" role="dialog" aria-label="Choose a desk item">
+      <div class="letter-head">Requisition Form</div>
+      <div class="letter-sub">Desk Furnishings · Form 7-B</div>
+      <p id="choice-text"></p>
+      <div id="choice-list"></div>
+      <button type="button" id="choice-later">Decide later</button>
+    </div>
+  </div>
+
+  <!-- Parcels: send open papers to another device as a link, or receive one -->
+  <div id="parcel" hidden>
+    <div class="letter" role="dialog" aria-labelledby="parcel-title">
+      <div class="letter-head" id="parcel-title"></div>
+      <div class="letter-sub" id="parcel-sub"></div>
+      <div id="parcel-body"></div>
+    </div>
+  </div>
+
+  <!-- Commendation letters (arrive with the morning post) -->
+  <div id="commend" hidden>
+    <div class="letter" role="dialog" aria-labelledby="commend-title">
+      <div class="letter-head">Commendation</div>
+      <div class="letter-sub">From the Office of the Director</div>
+      <p id="commend-dear"></p>
+      <p>It has come to the Bureau's attention that you are to be commended for:</p>
+      <div class="commend-title" id="commend-title"></div>
+      <p id="commend-text"></p>
+      <p class="commend-sign">— The Director</p>
+      <button type="button" class="letter-btn" id="commend-ok">File it away</button>
+    </div>
+  </div>
+
+  <!-- Welcome letter (first visit) -->
+  <div id="welcome" hidden>
+    <form class="letter" id="welcome-form" autocomplete="off">
+      <div class="letter-head">Bureau of Small Tasks</div>
+      <div class="letter-sub">Office of Appointments</div>
+      <p>Dear new clerk,</p>
+      <p>Welcome to the Bureau. Paperwork arrives on your desk; you decide its fate with a stamp. Nothing more is asked of you.</p>
+      <p>For our records, kindly complete the following.</p>
+      <label>Name, for the nameplate
+        <input id="w-name" type="text" maxlength="24" required placeholder="Your name">
+      </label>
+      <label>Daily quota of papers
+        <input id="w-quota" type="number" min="1" max="20" value="5" required>
+      </label>
+      <button type="submit" class="letter-btn">Report for duty</button>
+      <p class="letter-fine">Your desk is kept only in this browser. Nothing leaves it.</p>
+    </form>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
